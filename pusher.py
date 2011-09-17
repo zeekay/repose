@@ -1,5 +1,8 @@
 #!/usr/bin/env python
-import zmq
+import json, zmq
+
+with open('config.json') as f:
+    config = json.load(f)
 
 def hook(ui, repo, **kwargs):
     context = zmq.Context()
@@ -22,14 +25,14 @@ def server():
         os.chdir(path)
         logging.info(subprocess.check_output('hg up', shell=True))
         try:
-            logging.info(subprocess.check_output('hg push ssh://bb/zeekay/' + repo, shell=True))
+            logging.info(subprocess.check_output('hg push ' + config['bitbucket']['repo-url'] + repo, shell=True))
             logging.info('push to bitbucket successful')
         except Exception as e:
             logging.error('push to bitbucket failed: %s' % str(e))
-        if os.path.isdir(path + '/.hg/git'):
+        if os.path.isdir(path + '/.git'):
             try:
                 logging.info(subprocess.check_output('hg bookmark -f -r default master', shell=True))
-                logging.info(subprocess.check_output('hg push git+ssh://gh/zeekay/' + repo + '.git', shell=True))
+                logging.info(subprocess.check_output('hg push git+' + config['github']['repo-url'] + repo + '.git', shell=True))
                 logging.info('push to github successful')
             except Exception as e:
                 logging.error('push to gitbub failed: %s' % str(e))
