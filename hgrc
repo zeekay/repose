@@ -6,4 +6,4 @@ hggit =
 intree = True
 
 [hooks]
-changegroup = python:pusher.hook
+changegroup = python:~/pusher.py:hook
