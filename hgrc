@@ -1,0 +1,9 @@
+[extensions]
+hgext.bookmarks =
+hggit =
+
+[git]
+intree = True
+
+[hooks]
+changegroup = python:pusher.hook
