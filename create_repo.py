@@ -18,7 +18,7 @@ if args.bitbucket:
                                                         config['bitbucket']['password'],
                                                         'https://api.bitbucket.org/1.0/repositories/',
                                                         args.repo,
-                                                        '&is_private=True' if args.private else '')
+                                                        '&is_private=true' if args.private else '')
     output = subprocess.check_output(cmd, shell=True)
     try:
         json.loads(output)
@@ -52,3 +52,4 @@ if args.local:
         print 'successfully created %s locally' % args.repo
     except:
         print 'failed to create %s locally' % args.repo
+
