@@ -25,7 +25,7 @@ def server():
         os.chdir(path)
         logging.info(subprocess.check_output('hg up', shell=True))
         try:
-            logging.info(subprocess.check_output('hg push ' + config['bitbucket']['repo-url'] + repo, shell=True))
+            logging.info(subprocess.check_output('hg push -f ' + config['bitbucket']['repo-url'] + repo, shell=True))
             logging.info('push to bitbucket successful')
         except Exception as e:
             logging.error('push to bitbucket failed: %s' % str(e))
