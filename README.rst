@@ -2,12 +2,13 @@
 ``repose`` -- tools for working with mercurial and git repositories
 ===================================================================
 
-    Manage ``git`` and ``mercurial`` repositories simultaneously.
+        Manage ``git`` and ``mercurial`` repositories simultaneously.
+
 
 .. note::
 
-    Documentation lacking, but I'll be getting to work on that quickly.
-    Any help is welcome.
+        Documentation lacking, but I'll be getting to work on that quickly.
+        Any help is welcome.
 
 ``repose`` provides a few different tools to make managing ``git`` and 
 ``mercurial`` repositories simultaneously eaiser. You can setup a central 
