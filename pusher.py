@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import json, os, zmq
+import argparse, json, os, zmq
 
 CONFIG_FILE = os.path.expanduser('~/config.json')
 
@@ -13,10 +13,24 @@ def hook(ui, repo, **kwargs):
     root = os.path.split(repo.origroot)[-1]
     client.send(root)
 
-def server():
-    import logging, subprocess
-    logging.basicConfig(filename='pusher.log',level=logging.INFO)
+def push(path, repo):
+    os.chdir(path)
+    logging.info(subprocess.check_output('hg up', shell=True))
+    try:
+        logging.info(subprocess.check_output('hg push -f ' + config['bitbucket']['repo-url'] + repo, shell=True))
+        logging.info('push to bitbucket successful')
+    except Exception as e:
+        logging.error('push to bitbucket failed: %s' % str(e))
+    if os.path.isdir(path + '/.git'):
+        try:
+            logging.info(subprocess.check_output('hg bookmark -f -r default master', shell=True))
+            logging.info(subprocess.check_output('hg push git+' + config['github']['repo-url'] + repo + '.git', shell=True))
+            logging.info('push to github successful')
+        except Exception as e:
+            logging.error('push to gitbub failed: %s' % str(e))
 
+
+def server():
     context = zmq.Context()
     server = context.socket(zmq.PULL)
     server.bind('tcp://127.0.0.1:12987')
@@ -24,20 +38,20 @@ def server():
     while True:
         repo = server.recv()
         path = os.path.expanduser('~/' + repo)
-        os.chdir(path)
-        logging.info(subprocess.check_output('hg up', shell=True))
-        try:
-            logging.info(subprocess.check_output('hg push -f ' + config['bitbucket']['repo-url'] + repo, shell=True))
-            logging.info('push to bitbucket successful')
-        except Exception as e:
-            logging.error('push to bitbucket failed: %s' % str(e))
-        if os.path.isdir(path + '/.git'):
-            try:
-                logging.info(subprocess.check_output('hg bookmark -f -r default master', shell=True))
-                logging.info(subprocess.check_output('hg push git+' + config['github']['repo-url'] + repo + '.git', shell=True))
-                logging.info('push to github successful')
-            except Exception as e:
-                logging.error('push to gitbub failed: %s' % str(e))
+        push(path, repo)
 
 if __name__ == '__main__':
-    server()
+    import logging, subprocess
+    logging.basicConfig(filename='pusher.log',level=logging.INFO)
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--push')
+    parser.add_argument('--server', nargs='?', default=False)
+    args = parser.parse_args()
+
+    if args.server:
+        server()
+    elif args.push:
+        path = os.path.abspath(os.path.expanduser(args.push))
+        repo = os.path.split(path)[-1]
+        push(path, repo)
