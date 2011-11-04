@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--push')
-    parser.add_argument('--server', nargs='?', default=False)
+    parser.add_argument('--server', action='store_true')
     args = parser.parse_args()
 
     if args.server:
