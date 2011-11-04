@@ -15,25 +15,24 @@ def hook(ui, repo, **kwargs):
 
 def server():
     import logging, subprocess
-    
     logging.basicConfig(filename='pusher.log',level=logging.INFO)
 
     context = zmq.Context()
     server = context.socket(zmq.PULL)
     server.bind('tcp://127.0.0.1:12987')
-    
+
     while True:
         repo = server.recv()
         path = os.path.expanduser('~/' + repo)
         os.chdir(path)
         logging.info(subprocess.check_output('hg up', shell=True))
-        try: 
+        try:
             logging.info(subprocess.check_output('hg push -f ' + config['bitbucket']['repo-url'] + repo, shell=True))
             logging.info('push to bitbucket successful')
         except Exception as e:
             logging.error('push to bitbucket failed: %s' % str(e))
         if os.path.isdir(path + '/.git'):
-            try: 
+            try:
                 logging.info(subprocess.check_output('hg bookmark -f -r default master', shell=True))
                 logging.info(subprocess.check_output('hg push git+' + config['github']['repo-url'] + repo + '.git', shell=True))
                 logging.info('push to github successful')

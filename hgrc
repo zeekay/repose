@@ -1,3 +1,7 @@
+[ui]
+username = zeekay <zeekayy@gmail.com>
+editor = vim
+
 [extensions]
 hgext.bookmarks =
 hggit =
